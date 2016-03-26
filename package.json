@@ -1,0 +1,33 @@
+{
+  "name": "cache-async",
+  "version": "1.0.0",
+  "description": "Implementation of cache for asyncronous calls.",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/komanton/cache-async.git"
+  },
+  "keywords": [
+    "cache",
+    "async",
+    "ajax"
+  ],
+  "author": "Anton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/komanton/cache-async/issues"
+  },
+  "homepage": "https://github.com/komanton/cache-async",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
+    "mocha": "^2.4.5",
+    "timekeeper": "0.0.5"
+  },
+  "dependencies": {
+    "es6-shim": "^0.35.0"
+  }
+}
