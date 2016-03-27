@@ -1,22 +1,22 @@
 require('es6-shim');
 
-var chai = require("chai"), 
+var chai = require("chai"),
     chaiAsPromised = require("chai-as-promised"),
     sinonChai = require("sinon-chai"),
     sinon = require("sinon");
 require('sinon-as-promised')
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
-var should = chai.should(),    
+var should = chai.should(),
     assert = require('assert');
-    
+
 var Cache = require('../index');
-    
+
 var stubAsync = function(value, timeout, needReject) {
     return new Promise(function(resolve, reject) {
-        console.log('async start ...');
+        //console.log('async start ...');
         setTimeout(function() {
-            console.log('async end!');
+            //console.log('async end!');
             if (needReject == undefined || needReject === false) {
                 resolve(value);
             } else {
@@ -43,36 +43,66 @@ describe('Cache', function() {
                 .should.eventually.deep.equal(stubKV).notify(done);
         });
         it('should return cached key-value when async func resolved', function(done) {
-            var stubCallBack = sinon.stub().resolves(1);            
+            var stubCallBack = sinon.stub().resolves(1);
             cache.get(stubKV.key, stubCallBack, 500)
                 .should.eventually.deep.equal(stubKV)
-                .then(function() {return cache.get(stubKV.key, stubCallBack, 10)})
-                .should.eventually.deep.equal(stubKV)                
-                .then(function(){stubCallBack.should.have.been.calledOnce})              
+                .then(function() { return cache.get(stubKV.key, stubCallBack, 10) })
+                .should.eventually.deep.equal(stubKV)
+                .then(function() { stubCallBack.should.have.been.calledOnce })
                 .should.notify(done);
         });
         it('should return non-cached key-value when cache timeout', function(done) {
             var stubCallBack = sinon.stub().resolves(1);
             cache.get(stubKV.key, stubCallBack, 500)
                 .should.eventually.deep.equal(stubKV)
-                .then(function() {return cache.get(stubKV.key, stubCallBack, 10)})
-                .should.eventually.deep.equal(stubKV)                
-                .then(function() {return stubAsync(null, 550)})//expire cache                
-                .then(function() {return cache.get(stubKV.key, stubCallBack, 10)})
-                .should.eventually.deep.equal(stubKV)                
-                .then(function(){stubCallBack.should.have.been.calledTwice})              
+                .then(function() { return cache.get(stubKV.key, stubCallBack, 10) })
+                .should.eventually.deep.equal(stubKV)
+                .then(function() { return stubAsync(null, 550) })//expire cache                
+                .then(function() { return cache.get(stubKV.key, stubCallBack, 10) })
+                .should.eventually.deep.equal(stubKV)
+                .then(function() { stubCallBack.should.have.been.calledTwice })
                 .should.notify(done);
         });
         it('should return cached key-value when async long', function(done) {
-            var long = function() {return stubAsync(1, 90); };
+            var long = function() { return stubAsync(1, 90); };
             var stubCallBack = sinon.stub().resolves(1);
-            var longCallBack = function(){ return long().then(stubCallBack); };            
+            var longCallBack = function() { return long().then(stubCallBack); };
             Promise.all([
                 cache.get(stubKV.key, longCallBack, 500).should.eventually.deep.equal(stubKV),
                 cache.get(stubKV.key, longCallBack, 500).should.eventually.deep.equal(stubKV),
                 cache.get(stubKV.key, longCallBack, 500).should.eventually.deep.equal(stubKV),
-            ]).then(function(){stubCallBack.should.have.been.calledOnce})
-            .should.notify(done);
+            ]).then(function() { stubCallBack.should.have.been.calledOnce })
+                .should.notify(done);
+        });
+        it('should fail when async rejects fail', function(done) {
+            var long = function() { return stubAsync(1, 200); };
+            var stubCallBack = sinon.stub().rejects('error');
+            var longCallBack = function() { return long().then(stubCallBack); };            
+            cache.get(stubKV.key, longCallBack, 500)
+                .should.be.rejectedWith('error')
+                .then(function() { stubCallBack.should.have.been.calledOnce })
+                .should.notify(done);
+        });
+        it('should return cached key-value when async rejects fail and next not fail', function(done) {
+            var long = function() { return stubAsync(1, 200); };
+            var stubErrorCallBack = sinon.stub().rejects('error');
+            var longCallBack = function() { return long().then(stubErrorCallBack); };   
+            var stubCallBack = sinon.stub().resolves(1);         
+            cache.get(stubKV.key, longCallBack, 500)
+                .should.be.rejectedWith('error')
+                .then(function() { stubErrorCallBack.should.have.been.calledOnce })
+                .then(function() { return cache.get(stubKV.key, stubCallBack, 10) })
+                .should.eventually.deep.equal(stubKV)
+                .then(function() { stubCallBack.should.have.been.calledOnce })
+                .should.notify(done);
+        });
+        it('should fail when async throw', function(done) {
+            var stubCallBack = function(){ 
+                return new Promise(function(resolve, reject){ throw 'error'})
+            };
+            cache.get(stubKV.key, stubCallBack, 500)
+                .should.be.rejected                
+                .should.notify(done);
         });
     });
 });
