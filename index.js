@@ -33,7 +33,7 @@ module.exports = function($timeout) {
                         if (cacheItem.lock === false) {
                             resolve({ key: key, value: cacheItem.value.data });
                         } else {
-                            $timeout(wait, 2);
+                            $timeout(wait, 3);
                         }
                     };
                     $timeout(wait, 3);

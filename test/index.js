@@ -1,9 +1,16 @@
-
-var chai = require("chai"), chaiAsPromised = require("chai-as-promised");
+require('es6-shim');
+var chai = require("chai"), 
+    chaiAsPromised = require("chai-as-promised"),
+    sinonChai = require("sinon-chai"),
+    sinon = require("sinon");
+    
+chai.use(sinonChai);
 chai.use(chaiAsPromised);
-var should = chai.should(),
-    Cache = require('../index'),
+var should = chai.should(),    
     assert = require('assert');
+    
+var Cache = require('../index');
+    
 var stubAsync = function(value, timeout, needReject) {
     return new Promise(function(resolve, reject) {
         setTimeout(function() {
@@ -28,11 +35,25 @@ describe('Cache', function() {
 
     });
     describe('get', function() {
-        it('should return key-value when async func resolved', function() {
-            return Promise.all([
-                cache.get(stubKV.key, stubAsyncResolve, 10)
-                    .should.eventually.deep.equal(stubKV)
-            ]);
+        it('should return key-value when async func resolved', function(done) {
+            cache.get(stubKV.key, stubAsyncResolve, 10)
+                .should.eventually.deep.equal(stubKV).notify(done);
+        });
+
+        it('should return cached key-value when async func resolved', function(done) {
+            var callback = sinon.stub().returns(1);
+            var dd = function(){return stubAsyncResolve().then(function(){
+                return callback();});}
+            cache.get(stubKV.key, dd, 10)
+                .should.eventually.deep.equal(stubKV)
+                .then(cache.get(stubKV.key, dd, 10))
+                .should.eventually.deep.equal(stubKV)
+                .should.be.fulfilled
+                .then(function(){callback.should.have.been.calledOnce})              
+                .should.notify(done);
+        });
+        it('should ---- when async have not resolved', function() {
+            
         });
     });
 });
