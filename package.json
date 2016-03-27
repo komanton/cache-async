@@ -1,6 +1,6 @@
 {
   "name": "cache-async",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Implementation of cache for asyncronous calls.",
   "main": "index.js",
   "scripts": {
