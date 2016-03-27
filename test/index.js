@@ -64,5 +64,16 @@ describe('Cache', function() {
                 .then(function(){stubCallBack.should.have.been.calledTwice})              
                 .should.notify(done);
         });
+        it('should return cached key-value when async very long', function(done) {
+            var long = function() {return stubAsync(1, 90); };
+            var stubCallBack = sinon.stub().resolves(1);
+            var longCallBack = function(){ return long().then(stubCallBack); };            
+            Promise.all([
+                cache.get(stubKV.key, longCallBack, 500).should.eventually.deep.equal(stubKV),
+                cache.get(stubKV.key, longCallBack, 500).should.eventually.deep.equal(stubKV),
+                cache.get(stubKV.key, longCallBack, 500).should.eventually.deep.equal(stubKV),
+            ]).then(function(){stubCallBack.should.have.been.calledOnce})
+            .should.notify(done);
+        });
     });
 });
