@@ -41,7 +41,7 @@ module.exports = function($asyncWaiter, $asyncWaiterTimeout) {
                 }
                 var wait = function() {
                     if (cacheItem.lock === 'free') {
-                        console.info('get from waiter');
+                        //console.info('get from waiter');
                         var value = cacheItem.value.data;
                         resolve({ key: key, value: value });
                         return;
@@ -50,7 +50,7 @@ module.exports = function($asyncWaiter, $asyncWaiterTimeout) {
                         reject(error);
                         return;
                     } else {
-                        console.info(' waiter one more');
+                        //console.info(' waiter one more');
                         $asyncWaiter(wait, $asyncWaiterTimeout);
                     }
                 };
