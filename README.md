@@ -4,11 +4,11 @@ cache-async
 A small module providing cache for async methods with promises
 
 ## Installation
-
+```javascript
   npm install cache-async --save
-
+```
 ## Usage
-
+```javascript
 var Cache = require('cache-async');
 var asyncWaiter = setTimeout;
 var cache = Cache(asyncWaiter);
@@ -27,11 +27,11 @@ cache.get('key_1', function(){
     }, cacheTimeoutMilliseconds).then(function(){
         console.log(keyValue.key + ' ' + keyValue.value); //key_1 1
     });
-
+```
 ## Tests
-
+```javascript
   npm test
-
+```
 ## Contributing
 
 
