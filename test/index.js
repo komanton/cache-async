@@ -8,8 +8,7 @@ require('sinon-as-promised')
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 var should = chai.should(),    
-    assert = require('assert'),
-    tk = require('timekeeper');
+    assert = require('assert');
     
 var Cache = require('../index');
     
@@ -37,7 +36,6 @@ describe('Cache', function() {
         cache = Cache(asyncWaiter);
     });
     afterEach(function() {
-         tk.reset();
     });
     describe('get', function() {
         it('should return key-value when async func resolved', function(done) {

@@ -4,7 +4,7 @@
   "description": "Implementation of cache for asyncronous calls.",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec"
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec"        
   },
   "repository": {
     "type": "git",
@@ -24,11 +24,12 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
+    "codecov": "^1.0.1",
+    "istanbul": "^0.4.2",
     "mocha": "^2.4.5",
     "sinon": "^1.17.3",
     "sinon-as-promised": "^4.0.0",
-    "sinon-chai": "^2.8.0",
-    "timekeeper": "0.0.5"
+    "sinon-chai": "^2.8.0"
   },
   "dependencies": {
     "es6-shim": "^0.35.0"

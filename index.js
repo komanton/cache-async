@@ -2,7 +2,7 @@ require('es6-shim');
 module.exports = function($asyncWaiter, $asyncWaiterTimeout) {
     var cacheItems = [];
     if(!$asyncWaiterTimeout){
-        $asyncWaiterTimeout = 3;
+        $asyncWaiterTimeout = 10;
     }
     var get = function(key, action, timeout) {
         return new Promise(function(resolve, reject) {
@@ -22,6 +22,7 @@ module.exports = function($asyncWaiter, $asyncWaiterTimeout) {
                 //console.info('get from cache');
                 //console.info('Now: ' + now + ' expires ' + cacheItem.value.expires);
                 resolve({ key: key, value: cacheItem.value.data });
+                return;
             } else {
                 if (cacheItem.lock === false) {
                     cacheItem.lock = true;
@@ -32,14 +33,15 @@ module.exports = function($asyncWaiter, $asyncWaiterTimeout) {
                         cacheItem.value.expires = expires;
                         //console.info('Now: ' + now + ' expires ' + cacheItem.value.expires);
                         cacheItem.lock = false;
-                    }).catch(reject);
+                    }).catch(reject); //todo cacheItem.lock = false; error rethrow, waiter error 
                 }
                 var wait = function() {
                     if (cacheItem.lock === false) {
                         //console.info('get from waiter');
                         resolve({ key: key, value: cacheItem.value.data });
+                        return;
                     } else {
-                        //console.info('waiter one more');
+                        //console.info(' waiter one more');
                         $asyncWaiter(wait, $asyncWaiterTimeout);
                     }
                 };
@@ -49,6 +51,7 @@ module.exports = function($asyncWaiter, $asyncWaiterTimeout) {
     };
     return {
         get: get
+        //todo creal, clearByKey
     };
 };
 
