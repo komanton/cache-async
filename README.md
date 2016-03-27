@@ -24,7 +24,7 @@ cache.get('key_1', function(){
                 resolve(1);                
             }, 5000);
         });
-    }, cacheTimeoutMilliseconds).then(function(){
+    }, cacheTimeoutMilliseconds).then(function(keyValue){
         console.log(keyValue.key + ' ' + keyValue.value); //key_1 1
     });
 ```
