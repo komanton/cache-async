@@ -22,28 +22,25 @@ module.exports = function($timeout) {
             } else {
                 if (cacheItem.lock === false) {
                     cacheItem.lock = true;
-                    action().then(function(result) {                        
+                    action().then(function(result) {
                         cacheItem.value.data = result;
                         var expires = new Date(now.getTime());
                         expires.setMilliseconds(expires.getMilliseconds() + timeout);
                         cacheItem.value.expires = expires;
                         //console.info('Now: ' + now + ' expires ' + cacheItem.value.expires);
                         cacheItem.lock = false;
-                        //console.info('populate cache and get');
-                        resolve({ key: key, value: cacheItem.value.data });
                     }).catch(reject);
-                } else {
-                    var wait = function() {
-                        if (cacheItem.lock === false) {
-                            //console.info('get from waiter');
-                            resolve({ key: key, value: cacheItem.value.data });
-                        } else {
-                            //console.info('waiter one more');
-                            $timeout(wait, 3);
-                        }
-                    };
-                    $timeout(wait, 3);
                 }
+                var wait = function() {
+                    if (cacheItem.lock === false) {
+                        //console.info('get from waiter');
+                        resolve({ key: key, value: cacheItem.value.data });
+                    } else {
+                        //console.info('waiter one more');
+                        $timeout(wait, 3);
+                    }
+                };
+                $timeout(wait, 3);
             }
         });
     };
