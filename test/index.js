@@ -33,7 +33,8 @@ var stubKV = { key: 'key_1', value: 1 };
 describe('Cache', function() {
     var cache;
     beforeEach(function() {
-        cache = Cache(setTimeout);
+        var asyncWaiter = setTimeout;
+        cache = Cache(asyncWaiter);
     });
     afterEach(function() {
          tk.reset();
@@ -64,7 +65,7 @@ describe('Cache', function() {
                 .then(function(){stubCallBack.should.have.been.calledTwice})              
                 .should.notify(done);
         });
-        it('should return cached key-value when async very long', function(done) {
+        it('should return cached key-value when async long', function(done) {
             var long = function() {return stubAsync(1, 90); };
             var stubCallBack = sinon.stub().resolves(1);
             var longCallBack = function(){ return long().then(stubCallBack); };            

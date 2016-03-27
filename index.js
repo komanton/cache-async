@@ -1,6 +1,9 @@
 require('es6-shim');
-module.exports = function($timeout) {
+module.exports = function($asyncWaiter, $asyncWaiterTimeout) {
     var cacheItems = [];
+    if(!$asyncWaiterTimeout){
+        $asyncWaiterTimeout = 3;
+    }
     var get = function(key, action, timeout) {
         return new Promise(function(resolve, reject) {
             //console.info('get ->');
@@ -37,10 +40,10 @@ module.exports = function($timeout) {
                         resolve({ key: key, value: cacheItem.value.data });
                     } else {
                         //console.info('waiter one more');
-                        $timeout(wait, 3);
+                        $asyncWaiter(wait, $asyncWaiterTimeout);
                     }
                 };
-                $timeout(wait, 3);
+                $asyncWaiter(wait, $asyncWaiterTimeout);
             }
         });
     };
